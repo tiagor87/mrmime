@@ -1,0 +1,6 @@
+[
+  {
+    "path": "*",
+    "responseBuilderType": "reflect-request"
+  }
+]

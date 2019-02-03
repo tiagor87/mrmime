@@ -1,0 +1,42 @@
+[
+  {
+    "path": "/?customers",
+    "method": "Post",
+    "responseBuilderType": "merge-request",
+    "response": {
+      "id": "{Guid}",
+      "address": {
+        "addressId": "{Guid}"
+      }
+    }
+  },
+  {
+    "path": "/?customers/(\\w+)?",
+    "method": "Put",
+    "responseBuilderType": "reflect-request"
+  },
+  {
+    "path": "/?customers/(\\w+)?",
+    "method": "GET",
+    "responseBuilderType": "reflect-request"
+  },
+  {
+    "path": "/?customers",
+    "method": "GET",
+    "responseBuilderType": "reflect-request"
+  },
+  {
+    "path": "/?customers/(\\w+)?",
+    "method": "delete",
+    "responseBuilderType": "reflect-request"
+  },
+  {
+    "path": "/invalid",
+    "method": "GET",
+    "responseBuilderType": "invalid"
+  },
+  {
+    "path": ".*",
+    "responseBuilderType": "reflect-request"
+  }
+]
