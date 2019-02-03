@@ -11,7 +11,7 @@ namespace MrMime.Core.Aggregates.RequestFakeAgg
         public string ResponseBuilderType { get; set; }
         public IDictionary<string, object> Response { get; set; }
 
-        public IDictionary<string, dynamic> GetResponse(IDictionary<string, dynamic> requestValue)
+        public IDictionary<string, object> GetResponse(IDictionary<string, object> requestValue)
         {
             var builderTypes = new List<string>
             {

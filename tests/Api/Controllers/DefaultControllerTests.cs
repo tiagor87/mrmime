@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
 using Xunit;
@@ -17,7 +20,10 @@ namespace MrMime.Api.Tests.Controllers
 
         public DefaultControllerTests(WebApplicationFactory<Startup> factory)
         {
-            _factory = factory ?? throw new ArgumentNullException(nameof(factory));
+            _factory = factory.WithWebHostBuilder(options =>
+            {
+                options.UseContentRoot(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            }) ?? throw new ArgumentNullException(nameof(factory));
         }
 
         [Theory]
