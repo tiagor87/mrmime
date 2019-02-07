@@ -20,4 +20,4 @@ WORKDIR /app
 COPY --from=builder /app .
 
 ENV ASPNETCORE_ENVIRONMENT=Production
-ENTRYPOINT ["dotnet", "./src/Api/MrMime.Api.csproj"]
+ENTRYPOINT dotnet MrMime.Api.dll
