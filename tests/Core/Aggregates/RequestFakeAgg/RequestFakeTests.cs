@@ -12,6 +12,29 @@ namespace MrMime.Core.Tests.Aggregates.RequestFakeAgg
     public class RequestFakeTests
     {
         [Fact]
+        public void Should_get_response_when_has_null_value()
+        {
+            var requestJson = @"{
+                ""name"": ""Tiago Resende"",
+                ""age"": 31,
+                ""null_value"": null
+            }";
+
+            var requestBody = JsonConvert.DeserializeObject<IDictionary<string, object>>(requestJson);
+            var request = new RequestFake
+            {
+                Path = "users",
+                Method = HttpMethod.Post.Method,
+                Response = null,
+                ResponseBuilderType = ResponseBuilderType.RequestReflect
+            };
+
+            request.Invoking(x => x.GetResponse(requestBody))
+                .Should()
+                .NotThrow();
+        }
+
+        [Fact]
         public void Should_get_response_when_merge_request()
         {
             var requestJson = @"{

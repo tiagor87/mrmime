@@ -20,7 +20,12 @@ namespace MrMime.Core.Aggregates.RequestFakeAgg.Builders
         {
             var result = new Dictionary<string, object>();
             foreach (var pair in dictionary)
-                if (pair.Value.ToString().Equals("{Guid}", StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (pair.Value == null)
+                {
+                    result[pair.Key] = pair.Value;
+                }
+                else if (pair.Value.ToString().Equals("{Guid}", StringComparison.InvariantCultureIgnoreCase))
                 {
                     result[pair.Key] = Guid.NewGuid();
                 }
@@ -33,6 +38,7 @@ namespace MrMime.Core.Aggregates.RequestFakeAgg.Builders
                 {
                     result[pair.Key] = pair.Value;
                 }
+            }
 
             return result;
         }

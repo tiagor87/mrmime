@@ -73,6 +73,29 @@ namespace MrMime.Core.Tests.Aggregates.RequestFakeAgg.Builders
         }
 
         [Fact]
+        public void Should_not_throw_when_null_value()
+        {
+            var requestJson = @"{
+                ""name"": ""Tiago Resende"",
+                ""age"": 31,
+                ""address"": null
+            }";
+            var responseMockJson = @"{
+                ""id"": ""{Guid}""
+            }";
+
+            var request = JsonConvert.DeserializeObject<IDictionary<string, object>>(requestJson);
+            var responseMock = JsonConvert.DeserializeObject<IDictionary<string, object>>(responseMockJson);
+
+            new ResponseRequestMergeBuilder()
+                .FromRequest(request)
+                .MergeWith(responseMock)
+                .Invoking(x => x.Build())
+                .Should()
+                .NotThrow();
+        }
+
+        [Fact]
         public void Should_parse_guid_token()
         {
             var requestJson = @"{

@@ -10,6 +10,24 @@ namespace MrMime.Core.Tests.Aggregates.RequestFakeAgg.Builders
     public class ResponseRequestReflectBuilderTests
     {
         [Fact]
+        public void Should_not_throw_when_null_value()
+        {
+            var requestJson = @"{
+                ""name"": ""Tiago Resende"",
+                ""age"": 31,
+                ""address"": null
+            }";
+
+            var request = JsonConvert.DeserializeObject<IDictionary<string, object>>(requestJson);
+
+            new ResponseRequestReflectBuilder()
+                .FromRequest(request)
+                .Invoking(x => x.Build())
+                .Should()
+                .NotThrow();
+        }
+
+        [Fact]
         public void Should_parse_guid_tokens()
         {
             var requestJson = @"{
