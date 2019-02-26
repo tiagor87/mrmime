@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using FluentAssertions;
 using MrMime.Core.Aggregates.RequestFakeAgg.Builders;
 using Newtonsoft.Json;
@@ -28,6 +29,28 @@ namespace MrMime.Core.Tests.Aggregates.RequestFakeAgg.Builders
         }
 
         [Fact]
+        public void Should_parse__partial_guid_tokens()
+        {
+            var requestJson = @"{
+                ""id"": ""cus_{Guid}"",
+                ""name"": ""Tiago Resende"",
+                ""age"": 31
+            }";
+
+            var request = JsonConvert.DeserializeObject<IDictionary<string, object>>(requestJson);
+
+            var value = new ResponseRequestReflectBuilder()
+                .FromRequest(request)
+                .Build();
+
+            Regex.IsMatch(
+                value["id"].ToString(),
+                @"cus_\w{8}\-(\w{4}\-){3}\w{12}").Should().BeTrue();
+            value["name"].Should().Be("Tiago Resende");
+            value["age"].Should().Be(31);
+        }
+
+        [Fact]
         public void Should_parse_guid_tokens()
         {
             var requestJson = @"{
@@ -42,10 +65,7 @@ namespace MrMime.Core.Tests.Aggregates.RequestFakeAgg.Builders
                 .FromRequest(request)
                 .Build();
 
-            value["id"].Should()
-                .BeOfType<Guid>()
-                .And
-                .NotBe(Guid.Empty);
+            Guid.TryParse(value["id"].ToString(), out _).Should().BeTrue();
             value["name"].Should().Be("Tiago Resende");
             value["age"].Should().Be(31);
         }

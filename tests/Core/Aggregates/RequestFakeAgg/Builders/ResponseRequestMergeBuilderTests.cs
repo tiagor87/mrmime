@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using FluentAssertions;
 using MrMime.Core.Aggregates.RequestFakeAgg.Builders;
 using Newtonsoft.Json;
@@ -120,16 +121,51 @@ namespace MrMime.Core.Tests.Aggregates.RequestFakeAgg.Builders
 
             value["name"].Should().Be("Tiago Resende");
             value["age"].Should().Be(31);
-            value["id"].Should().BeOfType<Guid>().And.NotBe(Guid.Empty);
+            Guid.TryParse(value["id"].ToString(), out _).Should().BeTrue();
             value["address"].Should().BeAssignableTo<IDictionary<string, object>>();
             value["address"].As<IDictionary<string, object>>()
                 .Should()
                 .ContainKeys("id");
-            value["address"].As<IDictionary<string, object>>()["id"]
+            Guid.TryParse(value["address"].As<IDictionary<string, object>>()["id"].ToString(), out _);
+        }
+
+        [Fact]
+        public void Should_parse_partial_guid_token()
+        {
+            var requestJson = @"{
+                ""name"": ""Tiago Resende"",
+                ""age"": 31,
+                ""address"": {}
+            }";
+            var responseMockJson = @"{
+                ""id"": ""cus_{Guid}"",
+                ""address"": {
+                    ""id"": ""addr_{Guid}""
+                }
+            }";
+
+            var request = JsonConvert.DeserializeObject<IDictionary<string, object>>(requestJson);
+            var responseMock = JsonConvert.DeserializeObject<IDictionary<string, object>>(responseMockJson);
+
+            var value = new ResponseRequestMergeBuilder()
+                .FromRequest(request)
+                .MergeWith(responseMock)
+                .Build();
+
+            value["name"].Should().Be("Tiago Resende");
+            value["age"].Should().Be(31);
+            Regex.IsMatch(
+                value["id"].ToString(),
+                @"cus_\w{8}\-(\w{4}\-){3}\w{12}").Should().BeTrue();
+            value["address"].Should().BeAssignableTo<IDictionary<string, object>>();
+            value["address"].As<IDictionary<string, object>>()
                 .Should()
-                .BeOfType<Guid>()
-                .And
-                .NotBe(Guid.Empty);
+                .ContainKeys("id");
+            Regex.IsMatch(
+                    value["address"].As<IDictionary<string, object>>()["id"].ToString(),
+                    @"addr_\w{8}\-(\w{4}\-){3}\w{12}")
+                .Should()
+                .BeTrue();
         }
     }
 }

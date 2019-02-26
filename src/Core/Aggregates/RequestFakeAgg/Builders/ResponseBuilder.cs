@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 
 namespace MrMime.Core.Aggregates.RequestFakeAgg.Builders
@@ -25,14 +26,15 @@ namespace MrMime.Core.Aggregates.RequestFakeAgg.Builders
                 {
                     result[pair.Key] = pair.Value;
                 }
-                else if (pair.Value.ToString().Equals("{Guid}", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    result[pair.Key] = Guid.NewGuid();
-                }
                 else if (pair.Value is JObject obj)
                 {
                     var dic = obj.ToObject<IDictionary<string, object>>();
                     result.Add(pair.Key, ProcessResponse(dic));
+                }
+                else if (pair.Value.ToString().ToLower().Contains("{guid}"))
+                {
+                    result[pair.Key] = Regex.Replace(pair.Value.ToString(), @"{guid}", Guid.NewGuid().ToString(),
+                        RegexOptions.IgnoreCase);
                 }
                 else
                 {
