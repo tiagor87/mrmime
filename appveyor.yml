@@ -15,7 +15,6 @@ environment:
     secure: LxMNnXoY19dY5PBKZTm0sW/ttmcPnO6UmzKv27SUEVeHDVVdyi0l8GAycCmpTgAn
 before_build:
 - ps: dotnet.exe restore
-- sh: dotnet restore
 build:
   verbosity: minimal
 test_script:
@@ -35,13 +34,13 @@ deploy_script:
 - ps: >-
     docker login --username $env:DOCKER_USERNAME --password $env:DOCKER_PASSWORD
     
-    docker build -t tiagor87/mr-mime:latest .
+    docker build -t tiagor87/mr-mime:latest-windows .
     
-    docker push tiagor87/mr-mime:latest
+    docker push tiagor87/mr-mime:latest-windows
     
-    docker tag tiagor87/mr-mime:latest tiagor87/mr-mime:$env:APPVEYOR_BUILD_VERSION
+    docker tag tiagor87/mr-mime:latest-win tiagor87/mr-mime:$env:APPVEYOR_BUILD_VERSION-windows
     
-    docker push tiagor87/mr-mime:$env:APPVEYOR_BUILD_VERSION
+    docker push tiagor87/mr-mime:$env:APPVEYOR_BUILD_VERSION-windows
     
 - sh: >-
     docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
