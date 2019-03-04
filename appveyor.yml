@@ -34,13 +34,13 @@ deploy_script:
 - ps: >-
     docker login --username $env:DOCKER_USERNAME --password $env:DOCKER_PASSWORD
     
-    docker build -t tiagor87/mr-mime:latest-windows .
+    docker build -t tiagor87/mr-mime:latest-win .
     
-    docker push tiagor87/mr-mime:latest-windows
+    docker push tiagor87/mr-mime:latest-win
     
-    docker tag tiagor87/mr-mime:latest-win tiagor87/mr-mime:$env:APPVEYOR_BUILD_VERSION-windows
+    docker tag tiagor87/mr-mime:latest-win tiagor87/mr-mime:$env:APPVEYOR_BUILD_VERSION-win
     
-    docker push tiagor87/mr-mime:$env:APPVEYOR_BUILD_VERSION-windows
+    docker push tiagor87/mr-mime:$env:APPVEYOR_BUILD_VERSION-win
     
 - sh: >-
     docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
