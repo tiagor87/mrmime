@@ -22,15 +22,12 @@ namespace MrMime.Core.Aggregates.RequestFakeAgg.Builders
             var result = new Dictionary<string, object>();
             foreach (var pair in dictionary)
             {
-                if (pair.Value == null)
-                {
-                    result[pair.Key] = pair.Value;
-                }
-                else if (pair.Value is JObject obj)
+                if (pair.Value != null && pair.Value is JObject obj)
                 {
                     var dic = obj.ToObject<IDictionary<string, object>>();
                     result.Add(pair.Key, ProcessResponse(dic));
                 }
+
                 else if (pair.Value.ToString().ToLower().Contains("{guid}"))
                 {
                     result[pair.Key] = Regex.Replace(pair.Value.ToString(), @"{guid}", Guid.NewGuid().ToString(),

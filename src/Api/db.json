@@ -17,5 +17,26 @@
     "response": {
       "id": "{Guid}"
     }
+  },
+  {
+    "path": ".*/authorize",
+    "method": "POST",
+    "responseBuilderType": "response",
+    "response": {
+      "AmountInCents": "[request.AmountInCents]",
+      "AuthorizedAmountInCents": "[request.AmountInCents]",
+      "TransactionStatus": "Authorized",
+      "TransactionIdentifier": "{Guid}",
+      "UniqueSequentialNumber": "{Guid}",
+      "SoftDescriptor": null,
+      "CreateDate": "{DateTime}",
+      "AuthorizedDate": "{DateTime}",
+      "AuthorizationCode": "291",
+      "TransactionKey": "{Guid}",
+      "TransactionKeyToAcquirer": "[request.TransactionKeyToAcquirer]",
+      "TransactionReference": "[request.TransactionReference]",
+      "AcquirerMessage": "Transação authorizada com sucesso",
+      "AcquirerReturnCode": "00"
+    }
   }
 ]
