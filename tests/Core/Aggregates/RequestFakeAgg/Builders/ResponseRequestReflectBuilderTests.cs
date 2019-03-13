@@ -6,7 +6,7 @@ using MrMime.Core.Aggregates.RequestFakeAgg.Builders;
 using Newtonsoft.Json;
 using Xunit;
 
-namespace MrMime.UnitTests.Aggregates.RequestFakeAgg.Builders
+namespace MrMime.Core.Tests.Aggregates.RequestFakeAgg.Builders
 {
     public class ResponseRequestReflectBuilderTests
     {
