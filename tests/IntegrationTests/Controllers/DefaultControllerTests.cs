@@ -9,13 +9,16 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using MrMime.Api;
 using Newtonsoft.Json;
 using Xunit;
 
-namespace MrMime.Api.Tests.Controllers
+namespace MrMime.IntegrationTests.Controllers
 {
     public class DefaultControllerTests : IClassFixture<WebApplicationFactory<Startup>>
     {
+        private readonly WebApplicationFactory<Startup> _factory;
+
         public DefaultControllerTests(WebApplicationFactory<Startup> factory)
         {
             _factory = factory.WithWebHostBuilder(options =>
@@ -23,8 +26,6 @@ namespace MrMime.Api.Tests.Controllers
                 options.UseContentRoot(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
             }) ?? throw new ArgumentNullException(nameof(factory));
         }
-
-        private readonly WebApplicationFactory<Startup> _factory;
 
         [Theory]
         [InlineData("/customers?id=1&name=Test", "1", "Test")]
@@ -116,11 +117,6 @@ namespace MrMime.Api.Tests.Controllers
             var response = await client.DeleteAsync(path);
 
             response.StatusCode.Should().Be(HttpStatusCode.NoContent);
-        }
-
-        [Fact]
-        public async Task Should_return_response()
-        {
         }
     }
 }
