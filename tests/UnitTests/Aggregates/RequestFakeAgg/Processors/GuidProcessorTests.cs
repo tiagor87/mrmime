@@ -14,7 +14,6 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg.Processors
         [InlineData("Property", "{gui}", false)]
         [InlineData("Property", "{guid", false)]
         [InlineData("Property", "{guidd}", false)]
-        [InlineData("Property", "{guid", false)]
         public void Should_check_when_should_execute(string propertyName, string propertyValue, bool shouldExecute)
         {
             var property = new KeyValuePair<string, object>(propertyName, propertyValue);
