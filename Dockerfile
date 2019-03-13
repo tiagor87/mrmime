@@ -4,13 +4,13 @@ WORKDIR /source
 COPY ./MrMime.sln .
 COPY ./src/Api/MrMime.Api.csproj ./src/Api/MrMime.Api.csproj
 COPY ./src/Core/MrMime.Core.csproj ./src/Core/MrMime.Core.csproj
-COPY ./tests/Api/MrMime.Api.Tests.csproj ./tests/Api/MrMime.Api.Tests.csproj
-COPY ./tests/Core/MrMime.Core.Tests.csproj ./tests/Core/MrMime.Core.Tests.csproj
+COPY ./tests/IntegrationTests/MrMime.IntegrationTests.csproj ./tests/IntegrationTests/MrMime.IntegrationTests.csproj
+COPY ./tests/UnitTests/MrMime.UnitTests.csproj ./tests/UnitTests/MrMime.UnitTests.csproj
 RUN dotnet restore
 
 COPY . .
-RUN dotnet test ./tests/Core/MrMime.Core.Tests.csproj
-RUN dotnet test ./tests/Api/MrMime.Api.Tests.csproj
+RUN dotnet test ./tests/UnitTests/MrMime.UnitTests.csproj
+RUN dotnet test ./tests/IntegrationTests/MrMime.IntegrationTests.csproj
  
 RUN dotnet publish -c Release -o /app ./src/Api/MrMime.Api.csproj 
 
