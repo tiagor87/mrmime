@@ -1,23 +1,24 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Mime;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using MrMime.Api;
 using Newtonsoft.Json;
 using Xunit;
 
-namespace MrMime.Api.Tests.Controllers
+namespace MrMime.IntegrationTests.Controllers
 {
     public class DefaultControllerTests : IClassFixture<WebApplicationFactory<Startup>>
     {
-        private readonly WebApplicationFactory<Startup> _factory;
-
         public DefaultControllerTests(WebApplicationFactory<Startup> factory)
         {
             _factory = factory.WithWebHostBuilder(options =>
@@ -25,6 +26,8 @@ namespace MrMime.Api.Tests.Controllers
                 options.UseContentRoot(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
             }) ?? throw new ArgumentNullException(nameof(factory));
         }
+
+        private readonly WebApplicationFactory<Startup> _factory;
 
         [Theory]
         [InlineData("/customers?id=1&name=Test", "1", "Test")]
@@ -116,6 +119,61 @@ namespace MrMime.Api.Tests.Controllers
             var response = await client.DeleteAsync(path);
 
             response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        }
+
+        [Fact]
+        public async Task Should_copy_response_execute_processors()
+        {
+            var client = _factory.CreateClient();
+            var json = JsonConvert.SerializeObject(new
+            {
+                AmountInCents = 1490,
+                AutomaticCapture = false,
+                Card = new
+                {
+                    CardBrand = "Visa",
+                    CardNumber = "4000000000000077",
+                    ExpMonth = 1,
+                    ExpYear = 2020,
+                    HolderDocumentNumber = (object) null,
+                    HolderName = "Tony Stark",
+                    SecurityCode = "651"
+                },
+                Installment = 0,
+                SoftDescriptor = (object) null,
+                TransactionKeyToAcquirer = "aa063cd5-cddb-4a2c-9bba-98bdb9d1957e",
+                TransactionReference = "tran_O2g5Z18H3YUmJPEN",
+                NotifieUrl = "http://pruu.herokuapp.com/dump/testeget"
+            });
+            var content = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
+
+            var response = await client.PostAsync("/v11/authorize", content);
+            var responseContent =
+                JsonConvert.DeserializeObject<IDictionary<string, object>>(await response.Content.ReadAsStringAsync());
+
+            response.StatusCode.Should().Be(HttpStatusCode.Created);
+            responseContent.Should().NotBeNull();
+
+            responseContent.Keys.Should().HaveCount(14);
+
+            responseContent["AmountInCents"].Should().Be("1490");
+            responseContent["AuthorizedAmountInCents"].Should().Be("1490");
+            responseContent["TransactionStatus"].Should().Be("Authorized");
+            Guid.TryParse(responseContent["TransactionIdentifier"].ToString(), out _).Should().BeTrue();
+            Guid.TryParse(responseContent["UniqueSequentialNumber"].ToString(), out _).Should().BeTrue();
+            responseContent["SoftDescriptor"].Should().BeNull();
+            DateTime.TryParse(responseContent["CreateDate"].ToString(), null, DateTimeStyles.AdjustToUniversal,
+                out var createDate).Should().BeTrue();
+            createDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+            DateTime.TryParse(responseContent["AuthorizedDate"].ToString(), null, DateTimeStyles.AdjustToUniversal,
+                out var authorizedDate).Should().BeTrue();
+            authorizedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+            responseContent["AuthorizationCode"].Should().Be("291");
+            Guid.TryParse(responseContent["TransactionKey"].ToString(), out _).Should().BeTrue();
+            responseContent["TransactionKeyToAcquirer"].Should().Be("aa063cd5-cddb-4a2c-9bba-98bdb9d1957e");
+            responseContent["TransactionReference"].Should().Be("tran_O2g5Z18H3YUmJPEN");
+            responseContent["AcquirerMessage"].Should().Be("Transação authorizada com sucesso");
+            responseContent["AcquirerReturnCode"].Should().Be("00");
         }
     }
 }

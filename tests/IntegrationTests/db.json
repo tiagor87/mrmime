@@ -1,24 +1,5 @@
 [
   {
-    "path": "customers",
-    "method": "POST",
-    "responseBuilderType": "merge-request",
-    "response": {
-      "id": "{Guid}",
-      "address": {
-        "id": "{Guid}"
-      }
-    }
-  },
-  {
-    "path": "customers/.*/cards",
-    "method": "POST",
-    "responseBuilderType": "merge-request",
-    "response": {
-      "id": "{Guid}"
-    }
-  },
-  {
     "path": ".*/authorize",
     "method": "POST",
     "responseBuilderType": "response-copy",
