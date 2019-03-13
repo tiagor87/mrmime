@@ -1,20 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using MrMime.Core.Aggregates.RequestFakeAgg.Processers;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 
 namespace MrMime.Core.Aggregates.RequestFakeAgg.Builders
 {
     public abstract class ResponseBuilder<TBuilder> where TBuilder : ResponseBuilder<TBuilder>
     {
-        private IReadOnlyList<IProcessor> _processors;
-
-        protected ResponseBuilder()
-        {
-            _processors = GetProcessors().ToList();
-        }
-
         public IDictionary<string, object> RequestBody { get; private set; }
 
         public TBuilder FromRequest(IDictionary<string, object> requestBody)
@@ -25,44 +17,32 @@ namespace MrMime.Core.Aggregates.RequestFakeAgg.Builders
 
         public abstract IDictionary<string, object> Build();
 
-        protected IDictionary<string, object> ProcessResponse(IDictionary<string, object> response)
+        protected IDictionary<string, object> ProcessResponse(IDictionary<string, object> dictionary)
         {
             var result = new Dictionary<string, object>();
-            foreach (var property in response)
+            foreach (var pair in dictionary)
             {
-                if (property.Value != null && property.Value is JObject obj)
+                if (pair.Value == null)
                 {
-                    var innerProperty = obj.ToObject<IDictionary<string, object>>();
-                    result.Add(property.Key, ProcessResponse(innerProperty));
-                    continue;
+                    result[pair.Key] = pair.Value;
                 }
-
-                foreach (var processor in _processors.Where(x => x.ShouldExecute(property)))
+                else if (pair.Value is JObject obj)
                 {
-                    processor.Execute(result, property, RequestBody);
+                    var dic = obj.ToObject<IDictionary<string, object>>();
+                    result.Add(pair.Key, ProcessResponse(dic));
                 }
-
-                if (_processors.Any(x => x.ShouldExecute(property)) == false)
+                else if (pair.Value.ToString().ToLower().Contains("{guid}"))
                 {
-                    result[property.Key] = property.Value;
+                    result[pair.Key] = Regex.Replace(pair.Value.ToString(), @"{guid}", Guid.NewGuid().ToString(),
+                        RegexOptions.IgnoreCase);
+                }
+                else
+                {
+                    result[pair.Key] = pair.Value;
                 }
             }
 
             return result;
-        }
-
-        private static IEnumerable<IProcessor> GetProcessors()
-        {
-            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-
-            foreach (var typeInfo in assembly.DefinedTypes)
-            {
-                if (typeInfo.ImplementedInterfaces.Contains(typeof(IProcessor)) &&
-                    string.IsNullOrWhiteSpace(typeInfo.FullName) == false)
-                {
-                    yield return assembly.CreateInstance(typeInfo.FullName) as IProcessor;
-                }
-            }
         }
     }
 }
