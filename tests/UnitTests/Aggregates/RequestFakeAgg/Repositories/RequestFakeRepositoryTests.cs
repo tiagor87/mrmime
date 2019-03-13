@@ -2,7 +2,7 @@ using FluentAssertions;
 using MrMime.Core.Aggregates.RequestFakeAgg.Repositories;
 using Xunit;
 
-namespace MrMime.Core.Tests.Aggregates.RequestFakeAgg.Repositories
+namespace MrMime.UnitTests.Aggregates.RequestFakeAgg.Repositories
 {
     public class RequestFakeRepositoryTests
     {
