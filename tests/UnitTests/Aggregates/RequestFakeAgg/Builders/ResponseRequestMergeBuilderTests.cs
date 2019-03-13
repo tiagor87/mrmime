@@ -1,12 +1,10 @@
-using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using FluentAssertions;
 using MrMime.Core.Aggregates.RequestFakeAgg.Builders;
 using Newtonsoft.Json;
 using Xunit;
 
-namespace MrMime.Core.Tests.Aggregates.RequestFakeAgg.Builders
+namespace MrMime.UnitTests.Aggregates.RequestFakeAgg.Builders
 {
     public class ResponseRequestMergeBuilderTests
     {
@@ -94,78 +92,6 @@ namespace MrMime.Core.Tests.Aggregates.RequestFakeAgg.Builders
                 .Invoking(x => x.Build())
                 .Should()
                 .NotThrow();
-        }
-
-        [Fact]
-        public void Should_parse_guid_token()
-        {
-            var requestJson = @"{
-                ""name"": ""Tiago Resende"",
-                ""age"": 31,
-                ""address"": {}
-            }";
-            var responseMockJson = @"{
-                ""id"": ""{Guid}"",
-                ""address"": {
-                    ""id"": ""{Guid}""
-                }
-            }";
-
-            var request = JsonConvert.DeserializeObject<IDictionary<string, object>>(requestJson);
-            var responseMock = JsonConvert.DeserializeObject<IDictionary<string, object>>(responseMockJson);
-
-            var value = new ResponseRequestMergeBuilder()
-                .FromRequest(request)
-                .MergeWith(responseMock)
-                .Build();
-
-            value["name"].Should().Be("Tiago Resende");
-            value["age"].Should().Be(31);
-            Guid.TryParse(value["id"].ToString(), out _).Should().BeTrue();
-            value["address"].Should().BeAssignableTo<IDictionary<string, object>>();
-            value["address"].As<IDictionary<string, object>>()
-                .Should()
-                .ContainKeys("id");
-            Guid.TryParse(value["address"].As<IDictionary<string, object>>()["id"].ToString(), out _);
-        }
-
-        [Fact]
-        public void Should_parse_partial_guid_token()
-        {
-            var requestJson = @"{
-                ""name"": ""Tiago Resende"",
-                ""age"": 31,
-                ""address"": {}
-            }";
-            var responseMockJson = @"{
-                ""id"": ""cus_{Guid}"",
-                ""address"": {
-                    ""id"": ""addr_{Guid}""
-                }
-            }";
-
-            var request = JsonConvert.DeserializeObject<IDictionary<string, object>>(requestJson);
-            var responseMock = JsonConvert.DeserializeObject<IDictionary<string, object>>(responseMockJson);
-
-            var value = new ResponseRequestMergeBuilder()
-                .FromRequest(request)
-                .MergeWith(responseMock)
-                .Build();
-
-            value["name"].Should().Be("Tiago Resende");
-            value["age"].Should().Be(31);
-            Regex.IsMatch(
-                value["id"].ToString(),
-                @"cus_\w{8}\-(\w{4}\-){3}\w{12}").Should().BeTrue();
-            value["address"].Should().BeAssignableTo<IDictionary<string, object>>();
-            value["address"].As<IDictionary<string, object>>()
-                .Should()
-                .ContainKeys("id");
-            Regex.IsMatch(
-                    value["address"].As<IDictionary<string, object>>()["id"].ToString(),
-                    @"addr_\w{8}\-(\w{4}\-){3}\w{12}")
-                .Should()
-                .BeTrue();
         }
     }
 }
