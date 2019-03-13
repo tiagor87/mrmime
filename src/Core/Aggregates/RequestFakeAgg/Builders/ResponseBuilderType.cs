@@ -4,5 +4,6 @@ namespace MrMime.Core.Aggregates.RequestFakeAgg.Builders
     {
         public static string RequestReflect => "reflect-request";
         public static string RequestMerge => "merge-request";
+        public static string ResponseCopy => "response-copy";
     }
 }

@@ -12,7 +12,7 @@ namespace MrMime.Core.Aggregates.RequestFakeAgg.Processers
         }
 
         public void Execute(IDictionary<string, object> result, KeyValuePair<string, object> property,
-            IDictionary<string, object> _)
+            IDictionary<string, object> request = null)
         {
             result[property.Key] = Regex.Replace(property.Value.ToString(), @"{guid}", Guid.NewGuid().ToString(),
                 RegexOptions.IgnoreCase);

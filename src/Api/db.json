@@ -21,10 +21,10 @@
   {
     "path": ".*/authorize",
     "method": "POST",
-    "responseBuilderType": "response",
+    "responseBuilderType": "response-copy",
     "response": {
-      "AmountInCents": "[request.AmountInCents]",
-      "AuthorizedAmountInCents": "[request.AmountInCents]",
+      "AmountInCents": "[AmountInCents]",
+      "AuthorizedAmountInCents": "[AmountInCents]",
       "TransactionStatus": "Authorized",
       "TransactionIdentifier": "{Guid}",
       "UniqueSequentialNumber": "{Guid}",
@@ -33,8 +33,8 @@
       "AuthorizedDate": "{DateTime}",
       "AuthorizationCode": "291",
       "TransactionKey": "{Guid}",
-      "TransactionKeyToAcquirer": "[request.TransactionKeyToAcquirer]",
-      "TransactionReference": "[request.TransactionReference]",
+      "TransactionKeyToAcquirer": "[TransactionKeyToAcquirer]",
+      "TransactionReference": "[TransactionReference]",
       "AcquirerMessage": "Transação authorizada com sucesso",
       "AcquirerReturnCode": "00"
     }
