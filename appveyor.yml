@@ -1,10 +1,10 @@
 version: 0.0.{build}
 branches:
   only:
-  - master
+    - master
 image:
-- Visual Studio 2017
-- Ubuntu
+  - Visual Studio 2017
+  - Ubuntu
 configuration: Release
 environment:
   APPVEYOR_YML_DISABLE_PS_LINUX: true
@@ -14,42 +14,30 @@ environment:
   COVERALLS_REPO_TOKEN:
     secure: LxMNnXoY19dY5PBKZTm0sW/ttmcPnO6UmzKv27SUEVeHDVVdyi0l8GAycCmpTgAn
 before_build:
-- ps: dotnet.exe restore
+  - ps: dotnet.exe restore
 build:
   verbosity: minimal
 test_script:
-- ps: >-
-    nuget install OpenCover -OutputDirectory packages -Version 4.7.922
-    
-    dotnet tool install coveralls.net --tool-path packages
-    
-    .\packages\OpenCover.4.7.922\tools\OpenCover.Console.exe -register:user -target:"dotnet.exe" -targetargs:"test" -filter:"+[MrMime.Core]* +[MrMime.Api]* -[MrMime.*.Tests]* -[MrMime.Api]MrMime.Api.Program" -oldStyle -output:"coverage.xml" -excludebyattribute:ExcludeFromCodeCoverage
-    
-    .\packages\csmacnz.coveralls.exe --opencover -i coverage.xml --repoToken $env:COVERALLS_REPO_TOKEN
-    
-- sh: >-
-    dotnet test
-    
+  - ps: >-
+      nuget install OpenCover -OutputDirectory packages -Version 4.7.922
+
+      dotnet tool install coveralls.net --tool-path packages
+
+      .\packages\OpenCover.4.7.922\tools\OpenCover.Console.exe -register:user -target:"dotnet.exe" -targetargs:"test" -filter:"+[MrMime.Core]* +[MrMime.Api]* -[MrMime.*Tests]* -[MrMime.Api]MrMime.Api.Program" -oldStyle -output:"coverage.xml" -excludebyattribute:ExcludeFromCodeCoverage
+
+      .\packages\csmacnz.coveralls.exe --opencover -i coverage.xml --repoToken $env:COVERALLS_REPO_TOKEN
+
+  - sh: >-
+      dotnet test
+
 deploy_script:
-- ps: >-
-    docker login --username $env:DOCKER_USERNAME --password $env:DOCKER_PASSWORD
-    
-    docker build -t tiagor87/mr-mime:latest-win .
-    
-    docker push tiagor87/mr-mime:latest-win
-    
-    docker tag tiagor87/mr-mime:latest-win tiagor87/mr-mime:$env:APPVEYOR_BUILD_VERSION-win
-    
-    docker push tiagor87/mr-mime:$env:APPVEYOR_BUILD_VERSION-win
-    
-- sh: >-
-    docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
-    
-    docker build -t tiagor87/mr-mime:latest .
-    
-    docker push tiagor87/mr-mime:latest
-    
-    docker tag tiagor87/mr-mime:latest tiagor87/mr-mime:$APPVEYOR_BUILD_VERSION
-    
-    docker push tiagor87/mr-mime:$APPVEYOR_BUILD_VERSION
-    
+  - sh: >-
+      docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+
+      docker build -t tiagor87/mr-mime:latest .
+
+      docker push tiagor87/mr-mime:latest
+
+      docker tag tiagor87/mr-mime:latest tiagor87/mr-mime:$APPVEYOR_BUILD_VERSION
+
+      docker push tiagor87/mr-mime:$APPVEYOR_BUILD_VERSION
