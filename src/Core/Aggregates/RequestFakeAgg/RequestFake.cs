@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using MrMime.Core.Aggregates.RequestFakeAgg.Builders;
+using Newtonsoft.Json.Linq;
 
 namespace MrMime.Core.Aggregates.RequestFakeAgg
 {
@@ -9,9 +10,9 @@ namespace MrMime.Core.Aggregates.RequestFakeAgg
         public string Path { get; set; }
         public string Method { get; set; }
         public string ResponseBuilderType { get; set; }
-        public IDictionary<string, object> Response { get; set; }
+        public JObject Response { get; set; }
 
-        public IDictionary<string, object> GetResponse(IDictionary<string, object> requestValue)
+        public JObject GetResponse(JObject requestValue)
         {
             var builderTypes = new List<string>
             {

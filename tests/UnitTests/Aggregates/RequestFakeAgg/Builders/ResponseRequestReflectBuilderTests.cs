@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using FluentAssertions;
 using MrMime.Core.Aggregates.RequestFakeAgg.Builders;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace MrMime.UnitTests.Aggregates.RequestFakeAgg.Builders
@@ -19,7 +20,7 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg.Builders
                 ""address"": null
             }";
 
-            var request = JsonConvert.DeserializeObject<IDictionary<string, object>>(requestJson);
+            var request = JsonConvert.DeserializeObject<JObject>(requestJson);
 
             new ResponseRequestReflectBuilder()
                 .FromRequest(request)
@@ -37,7 +38,7 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg.Builders
                 ""age"": 31
             }";
 
-            var request = JsonConvert.DeserializeObject<IDictionary<string, object>>(requestJson);
+            var request = JsonConvert.DeserializeObject<JObject>(requestJson);
 
             var value = new ResponseRequestReflectBuilder()
                 .FromRequest(request)
@@ -46,8 +47,8 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg.Builders
             Regex.IsMatch(
                 value["id"].ToString(),
                 @"cus_\w{8}\-(\w{4}\-){3}\w{12}").Should().BeTrue();
-            value["name"].Should().Be("Tiago Resende");
-            value["age"].Should().Be(31);
+            value["name"].Value<string>().Should().Be("Tiago Resende");
+            value["age"].Value<int>().Should().Be(31);
         }
 
         [Fact]
@@ -59,15 +60,15 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg.Builders
                 ""age"": 31
             }";
 
-            var request = JsonConvert.DeserializeObject<IDictionary<string, object>>(requestJson);
+            var request = JsonConvert.DeserializeObject<JObject>(requestJson);
 
             var value = new ResponseRequestReflectBuilder()
                 .FromRequest(request)
                 .Build();
 
             Guid.TryParse(value["id"].ToString(), out _).Should().BeTrue();
-            value["name"].Should().Be("Tiago Resende");
-            value["age"].Should().Be(31);
+            value["name"].Value<string>().Should().Be("Tiago Resende");
+            value["age"].Value<int>().Should().Be(31);
         }
 
         [Fact]
@@ -78,14 +79,14 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg.Builders
                 ""age"": 31
             }";
 
-            var request = JsonConvert.DeserializeObject<IDictionary<string, object>>(requestJson);
+            var request = JsonConvert.DeserializeObject<JObject>(requestJson);
 
             var value = new ResponseRequestReflectBuilder()
                 .FromRequest(request)
                 .Build();
 
-            value["name"].Should().Be("Tiago Resende");
-            value["age"].Should().Be(31);
+            value["name"].Value<string>().Should().Be("Tiago Resende");
+            value["age"].Value<int>().Should().Be(31);
         }
     }
 }

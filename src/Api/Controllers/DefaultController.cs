@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
 using MrMime.Core.Aggregates.RequestFakeAgg.Repositories;
+using Newtonsoft.Json.Linq;
 
 namespace MrMime.Api.Controllers
 {
@@ -27,10 +28,8 @@ namespace MrMime.Api.Controllers
         [HttpGet]
         public IActionResult Get(string path, [FromQuery] IDictionary<string, string> query)
         {
-            var dic = new Dictionary<string, object>();
-            foreach (var pair in query) dic.Add(pair.Key, pair.Value);
             var fake = _repository.GetRequestFake(path, HttpMethod.Get.Method);
-            return Ok(fake.GetResponse(dic));
+            return Ok(fake.GetResponse(JObject.FromObject(query)));
         }
 
         /// <summary>
@@ -42,7 +41,7 @@ namespace MrMime.Api.Controllers
         ///     <param name="value">body content</param>
         /// </returns>
         [HttpPost]
-        public IActionResult Post(string path, [FromBody] IDictionary<string, object> value)
+        public IActionResult Post(string path, [FromBody] JObject value)
         {
             var fake = _repository.GetRequestFake(path, HttpMethod.Post.Method);
             return StatusCode(201, fake.GetResponse(value));
@@ -57,7 +56,7 @@ namespace MrMime.Api.Controllers
         ///     <param name="value">body content</param>
         /// </returns>
         [HttpPut]
-        public IActionResult Put(string path, [FromBody] IDictionary<string, object> value)
+        public IActionResult Put(string path, [FromBody] JObject value)
         {
             var fake = _repository.GetRequestFake(path, HttpMethod.Put.Method);
             return Ok(fake.GetResponse(value));

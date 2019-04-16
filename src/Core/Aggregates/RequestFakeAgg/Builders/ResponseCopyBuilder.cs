@@ -1,18 +1,19 @@
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace MrMime.Core.Aggregates.RequestFakeAgg.Builders
 {
     public class ResponseCopyBuilder : ResponseBuilder<ResponseCopyBuilder>
     {
-        private IDictionary<string, object> _response;
+        private JObject _response;
 
-        public ResponseCopyBuilder WithResponse(IDictionary<string, object> response)
+        public ResponseCopyBuilder WithResponse(JObject response)
         {
             _response = response;
             return this;
         }
 
-        public override IDictionary<string, object> Build()
+        public override JObject Build()
         {
             return ProcessResponse(_response);
         }

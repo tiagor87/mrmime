@@ -38,5 +38,69 @@
       "AcquirerMessage": "Transação authorizada com sucesso",
       "AcquirerReturnCode": "00"
     }
+  },
+  {
+    "path": "Sale/Query/TransactionReference=tran_\\w+",
+    "method": "GET",
+    "responseBuilderType": "merge-request",
+    "response": {
+      "ErrorReport": null,
+      "InternalTime": 90,
+      "MerchantKey": "{Guid}",
+      "RequestKey": "{Guid}",
+      "SaleDataCollection": [
+        {
+          "AntiFraudAnalysisData": null,
+          "BoletoTransactionDataCollection": null,
+          "BuyerKey": "{Guid}",
+          "CreditCardTransactionDataCollection": [
+            {
+              "AcquirerAuthorizationCode": "009427",
+              "AcquirerMessage": "Stone|Aprovado",
+              "AcquirerName": "Stone",
+              "AcquirerReturnCode": "0000",
+              "AffiliationCode": "f08e94cf83e942cd9adfbf522c0a25af",
+              "AmountInCents": 12445,
+              "AuthorizedAmountInCents": 12445,
+              "CaptureExpirationDate": null,
+              "CapturedAmountInCents": 12445,
+              "CapturedDate": "{DateTime}",
+              "CreateDate": "{DateTime}",
+              "CreditCard": {
+                "CreditCardBrand": "Mastercard",
+                "InstantBuyKey": "{Guid}",
+                "IsExpiredCreditCard": false,
+                "MaskedCreditCardNumber": "544540****9281"
+              },
+              "CreditCardOperation": "AuthAndCapture",
+              "CreditCardTransactionStatus": "Captured",
+              "DueDate": null,
+              "EstablishmentCode": "198751349",
+              "InstallmentCount": 1,
+              "IsReccurency": false,
+              "IsRetryTransaction": false,
+              "PaymentMethodName": "Stone",
+              "RefundedAmountInCents": null,
+              "ThirdPartyAffiliationCode": "",
+              "TransactionIdentifier": "15792972731634",
+              "TransactionKey": "{Guid}",
+              "TransactionKeyToAcquirer": "f72e1e98a4684a7c",
+              "TransactionReference": "tran_{Guid}",
+              "UniqueSequentialNumber": "15792972731634",
+              "VoidedAmountInCents": null
+            }
+          ],
+          "CryptoTransactionDataCollection": null,
+          "OnlineDebitTransactionData": null,
+          "OrderData": {
+            "CreateDate": "{DateTime}",
+            "OrderKey": "{Guid}",
+            "OrderReference": "V1JGI0AXPM-14"
+          }
+        }
+      ],
+      "SaleDataCount": 1,
+      "TokenData": null
+    }
   }
 ]

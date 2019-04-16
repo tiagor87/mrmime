@@ -1,10 +1,11 @@
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using FluentAssertions;
 using MrMime.Core.Aggregates.RequestFakeAgg;
 using MrMime.Core.Aggregates.RequestFakeAgg.Builders;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace MrMime.UnitTests.Aggregates.RequestFakeAgg
@@ -20,7 +21,7 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg
                 ""null_value"": null
             }";
 
-            var requestBody = JsonConvert.DeserializeObject<IDictionary<string, object>>(requestJson);
+            var requestBody = JsonConvert.DeserializeObject<JObject>(requestJson);
             var request = new RequestFake
             {
                 Path = "users",
@@ -32,6 +33,31 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg
             request.Invoking(x => x.GetResponse(requestBody))
                 .Should()
                 .NotThrow();
+        }
+        
+        [Fact]
+        public void Should_get_response_when_has_array_value()
+        {
+            var requestJson = @"{
+                ""name"": ""Tiago Resende"",
+                ""age"": 31,
+                ""contacts"": [
+                    { ""contact"": ""contact 1"" }
+                ]
+            }";
+
+            var requestBody = JsonConvert.DeserializeObject<JObject>(requestJson);
+            var request = new RequestFake
+            {
+                Path = "users",
+                Method = HttpMethod.Post.Method,
+                Response = null,
+                ResponseBuilderType = ResponseBuilderType.RequestReflect
+            };
+
+            var result = request.GetResponse(requestBody);
+            result["contacts"].Should().HaveCount(1);
+            result["contacts"].ToList().First()["contact"].Value<string>().Should().Be("contact 1");
         }
 
         [Fact]
@@ -45,8 +71,8 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg
             ""id"": 1
             }";
 
-            var requestBody = JsonConvert.DeserializeObject<IDictionary<string, object>>(requestJson);
-            var responseBody = JsonConvert.DeserializeObject<IDictionary<string, object>>(responseMockJson);
+            var requestBody = JsonConvert.DeserializeObject<JObject>(requestJson);
+            var responseBody = JsonConvert.DeserializeObject<JObject>(responseMockJson);
             var request = new RequestFake
             {
                 Path = "users",
@@ -58,9 +84,9 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg
             var response = request.GetResponse(requestBody);
 
 
-            response["name"].Should().Be("Tiago Resende");
-            response["age"].Should().Be(31);
-            response["id"].Should().Be(1);
+            response["name"].Value<string>().Should().Be("Tiago Resende");
+            response["age"].Value<int>().Should().Be(31);
+            response["id"].Value<int>().Should().Be(1);
         }
 
         [Fact]
@@ -71,7 +97,7 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg
             ""age"": 31
             }";
 
-            var requestBody = JsonConvert.DeserializeObject<IDictionary<string, object>>(requestJson);
+            var requestBody = JsonConvert.DeserializeObject<JObject>(requestJson);
             var request = new RequestFake
             {
                 Path = "users",
@@ -82,8 +108,8 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg
 
             var response = request.GetResponse(requestBody);
             response.Should().NotBeNull();
-            response.Should().ContainKeys("name", "age");
-            response.Values.Should().ContainInOrder("Tiago Resende", 31);
+            response["name"].Value<string>().Should().Be("Tiago Resende");
+            response["age"].Value<int>().Should().Be(31);
         }
 
 
@@ -98,7 +124,7 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg
             };
 
             request
-                .Invoking(x => x.GetResponse(new Dictionary<string, object>()))
+                .Invoking(x => x.GetResponse(new JObject()))
                 .Should()
                 .Throw<ArgumentException>()
                 .And

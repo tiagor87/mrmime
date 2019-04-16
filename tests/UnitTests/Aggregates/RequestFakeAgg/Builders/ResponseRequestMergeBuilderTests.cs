@@ -1,7 +1,7 @@
-using System.Collections.Generic;
 using FluentAssertions;
 using MrMime.Core.Aggregates.RequestFakeAgg.Builders;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace MrMime.UnitTests.Aggregates.RequestFakeAgg.Builders
@@ -26,25 +26,20 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg.Builders
                 }
             }";
 
-            var request = JsonConvert.DeserializeObject<IDictionary<string, object>>(requestJson);
-            var responseMock = JsonConvert.DeserializeObject<IDictionary<string, object>>(responseMockJson);
+            var request = JsonConvert.DeserializeObject<JObject>(requestJson);
+            var responseMock = JsonConvert.DeserializeObject<JObject>(responseMockJson);
 
             var value = new ResponseRequestMergeBuilder()
                 .FromRequest(request)
                 .MergeWith(responseMock)
                 .Build();
 
-            value["name"].Should().Be("Tiago Resende");
-            value["age"].Should().Be(31);
-            value["id"].Should().Be(1);
-            value["address"].Should().BeAssignableTo<IDictionary<string, object>>();
-            value["address"].As<IDictionary<string, object>>()
-                .Should()
-                .ContainKeys("id", "street");
-            value["address"].As<IDictionary<string, object>>()
-                .Values
-                .Should()
-                .Contain("Rua A. C.", "100", 1);
+            value["name"].Value<string>().Should().Be("Tiago Resende");
+            value["age"].Value<int>().Should().Be(31);
+            value["id"].Value<int>().Should().Be(1);
+            value["address"].Should().BeOfType<JObject>().And.NotBeNull();
+            value["address"]["id"].Value<string>().Should().NotBeNull();
+            value["address"]["street"].Value<string>().Should().NotBeNull();
         }
 
         [Fact]
@@ -58,17 +53,17 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg.Builders
             ""id"": 1
             }";
 
-            var request = JsonConvert.DeserializeObject<IDictionary<string, object>>(requestJson);
-            var responseMock = JsonConvert.DeserializeObject<IDictionary<string, object>>(responseMockJson);
+            var request = JsonConvert.DeserializeObject<JObject>(requestJson);
+            var responseMock = JsonConvert.DeserializeObject<JObject>(responseMockJson);
 
             var value = new ResponseRequestMergeBuilder()
                 .FromRequest(request)
                 .MergeWith(responseMock)
                 .Build();
 
-            value["name"].Should().Be("Tiago Resende");
-            value["age"].Should().Be(31);
-            value["id"].Should().Be(1);
+            value["name"].Value<string>().Should().Be("Tiago Resende");
+            value["age"].Value<int>().Should().Be(31);
+            value["id"].Value<int>().Should().Be(1);
         }
 
         [Fact]
@@ -83,8 +78,8 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg.Builders
                 ""id"": ""{Guid}""
             }";
 
-            var request = JsonConvert.DeserializeObject<IDictionary<string, object>>(requestJson);
-            var responseMock = JsonConvert.DeserializeObject<IDictionary<string, object>>(responseMockJson);
+            var request = JsonConvert.DeserializeObject<JObject>(requestJson);
+            var responseMock = JsonConvert.DeserializeObject<JObject>(responseMockJson);
 
             new ResponseRequestMergeBuilder()
                 .FromRequest(request)

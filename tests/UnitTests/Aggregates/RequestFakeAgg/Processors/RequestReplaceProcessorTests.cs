@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using FluentAssertions;
 using MrMime.Core.Aggregates.RequestFakeAgg.Processers;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace MrMime.UnitTests.Aggregates.RequestFakeAgg.Processors
@@ -20,7 +21,7 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg.Processors
         [InlineData("Property", "[]", false)]
         public void Should_check_when_should_execute(string propertyName, string propertyValue, bool shouldExecute)
         {
-            var property = new KeyValuePair<string, object>(propertyName, propertyValue);
+            var property = new KeyValuePair<string, JToken>(propertyName, propertyValue);
 
             var processor = new RequestReplaceProcessor();
 
@@ -36,16 +37,13 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg.Processors
         public void Should_read_request_value(string json, string propertyName, string replaceProperty,
             string expectedValue)
         {
-            var request = JsonConvert.DeserializeObject<IDictionary<string, object>>(json);
+            var request = JsonConvert.DeserializeObject<JObject>(json);
 
-            var result = new Dictionary<string, object>();
+            var result = new JObject();
             var processor = new RequestReplaceProcessor();
-            processor.Execute(result, new KeyValuePair<string, object>(propertyName, replaceProperty), request);
+            processor.Execute(result, new KeyValuePair<string, JToken>(propertyName, replaceProperty), request);
 
-            result.Should()
-                .ContainKey(propertyName)
-                .And
-                .ContainValue(expectedValue);
+            result[propertyName].Value<string>().Should().Be(expectedValue);
         }
 
         [Theory]
@@ -53,14 +51,14 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg.Processors
         [InlineData(@"{""customername"": ""Tiago Resende""}", "CustomerName", "[customer_name]")]
         public void Should_throw_when_property_not_found(string json, string propertyName, string replaceProperty)
         {
-            var request = JsonConvert.DeserializeObject<IDictionary<string, object>>(json);
+            var request = JsonConvert.DeserializeObject<JObject>(json);
 
-            var result = new Dictionary<string, object>();
+            var result = new JObject();
             var processor = new RequestReplaceProcessor();
 
             processor
                 .Invoking(x =>
-                    x.Execute(result, new KeyValuePair<string, object>(propertyName, replaceProperty), request))
+                    x.Execute(result, new KeyValuePair<string, JToken>(propertyName, replaceProperty), request))
                 .Should()
                 .Throw<KeyNotFoundException>();
         }

@@ -1,12 +1,13 @@
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace MrMime.Core.Aggregates.RequestFakeAgg.Processers
 {
     public interface IProcessor
     {
-        bool ShouldExecute(KeyValuePair<string, object> property);
+        bool ShouldExecute(KeyValuePair<string, JToken> property);
 
-        void Execute(IDictionary<string, object> result, KeyValuePair<string, object> property,
-            IDictionary<string, object> request = null);
+        void Execute(JObject result, KeyValuePair<string, JToken> property,
+            JObject request = null);
     }
 }

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using MrMime.Api;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace MrMime.IntegrationTests.Controllers
@@ -39,12 +40,12 @@ namespace MrMime.IntegrationTests.Controllers
 
             var response = await client.GetAsync(path);
             var content =
-                JsonConvert.DeserializeObject<IDictionary<string, object>>(await response.Content.ReadAsStringAsync());
+                JsonConvert.DeserializeObject<JObject>(await response.Content.ReadAsStringAsync());
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             content.Should().ContainKeys(nameof(id), nameof(name));
-            content[nameof(id)].Should().Be(id);
-            content[nameof(name)].Should().Be(name);
+            content[nameof(id)].Value<string>().Should().Be(id);
+            content[nameof(name)].Value<string>().Should().Be(name);
         }
 
         [Theory]

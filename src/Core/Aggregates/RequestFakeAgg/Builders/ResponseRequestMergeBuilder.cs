@@ -5,23 +5,21 @@ namespace MrMime.Core.Aggregates.RequestFakeAgg.Builders
 {
     public class ResponseRequestMergeBuilder : ResponseBuilder<ResponseRequestMergeBuilder>
     {
-        public IDictionary<string, object> MergeObject { get; private set; }
+        public JObject MergeObject { get; private set; }
 
-        public ResponseRequestMergeBuilder MergeWith(IDictionary<string, object> mergeObject)
+        public ResponseRequestMergeBuilder MergeWith(JObject mergeObject)
         {
             MergeObject = mergeObject;
             return this;
         }
 
-        public override IDictionary<string, object> Build()
+        public override JObject Build()
         {
-            var obj = JObject.FromObject(RequestBody);
-            var mergeObj = JObject.FromObject(MergeObject);
-            obj.Merge(mergeObj, new JsonMergeSettings
+            RequestBody.Merge(MergeObject, new JsonMergeSettings
             {
                 MergeArrayHandling = MergeArrayHandling.Union
             });
-            return ProcessResponse(obj.ToObject<IDictionary<string, object>>());
+            return ProcessResponse(RequestBody);
         }
     }
 }

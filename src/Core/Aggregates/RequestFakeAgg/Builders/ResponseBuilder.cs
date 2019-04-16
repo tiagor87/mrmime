@@ -15,24 +15,35 @@ namespace MrMime.Core.Aggregates.RequestFakeAgg.Builders
             _processors = GetProcessors().ToList();
         }
 
-        public IDictionary<string, object> RequestBody { get; private set; }
+        public JObject RequestBody { get; private set; }
 
-        public TBuilder FromRequest(IDictionary<string, object> requestBody)
+        public TBuilder FromRequest(JObject requestBody)
         {
             RequestBody = requestBody ?? throw new ArgumentNullException(nameof(requestBody));
             return (TBuilder) this;
         }
 
-        public abstract IDictionary<string, object> Build();
+        public abstract JObject Build();
 
-        protected IDictionary<string, object> ProcessResponse(IDictionary<string, object> response)
+        protected JObject ProcessResponse(JObject response)
         {
-            var result = new Dictionary<string, object>();
+            var result = new JObject();
             foreach (var property in response)
             {
+                if (property.Value != null && property.Value is JArray list)
+                {
+                    var propertyList = new List<JObject>();
+                    foreach (var item in list.ToList())
+                    {
+                        propertyList.Add(ProcessResponse(item.ToObject<JObject>()));
+                    }
+                    result.Add(property.Key, JArray.FromObject(propertyList));
+                    continue;
+                }
+                
                 if (property.Value != null && property.Value is JObject obj)
                 {
-                    var innerProperty = obj.ToObject<IDictionary<string, object>>();
+                    var innerProperty = obj;
                     result.Add(property.Key, ProcessResponse(innerProperty));
                     continue;
                 }

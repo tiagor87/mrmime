@@ -1,10 +1,10 @@
-using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace MrMime.Core.Aggregates.RequestFakeAgg.Builders
 {
     public class ResponseRequestReflectBuilder : ResponseBuilder<ResponseRequestReflectBuilder>
     {
-        public override IDictionary<string, object> Build()
+        public override JObject Build()
         {
             return ProcessResponse(RequestBody);
         }
