@@ -29,7 +29,7 @@ namespace MrMime.Api.Controllers
         public IActionResult Get(string path, [FromQuery] IDictionary<string, string> query)
         {
             var fake = _repository.GetRequestFake(path, HttpMethod.Get.Method);
-            return Ok(fake.GetResponse(JObject.FromObject(query)));
+            return StatusCode(fake.GetResponseStatusCode(), fake.GetResponse(JObject.FromObject(query)));
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace MrMime.Api.Controllers
         public IActionResult Post(string path, [FromBody] JObject value)
         {
             var fake = _repository.GetRequestFake(path, HttpMethod.Post.Method);
-            return StatusCode(201, fake.GetResponse(value));
+            return StatusCode(fake.GetResponseStatusCode(), fake.GetResponse(value));
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace MrMime.Api.Controllers
         public IActionResult Put(string path, [FromBody] JObject value)
         {
             var fake = _repository.GetRequestFake(path, HttpMethod.Put.Method);
-            return Ok(fake.GetResponse(value));
+            return StatusCode(fake.GetResponseStatusCode(), fake.GetResponse(value));
         }
 
         /// <summary>
@@ -70,7 +70,8 @@ namespace MrMime.Api.Controllers
         [HttpDelete]
         public IActionResult Delete(string path)
         {
-            return NoContent();
+            var fake = _repository.GetRequestFake(path, HttpMethod.Delete.Method);
+            return StatusCode(fake.GetResponseStatusCode());
         }
     }
 }

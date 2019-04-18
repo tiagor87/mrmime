@@ -102,5 +102,29 @@
       "SaleDataCount": 1,
       "TokenData": null
     }
+  },
+  {
+    "path": "ok",
+    "method": "POST",
+    "statusCode": 200,
+    "responseBuilderType": "reflect-request"
+  },
+  {
+    "path": "created",
+    "method": "POST",
+    "statusCode": 201,
+    "responseBuilderType": "reflect-request"
+  },
+  {
+    "path": "badRequest",
+    "method": "POST",
+    "statusCode": 400,
+    "responseBuilderType": "reflect-request"
+  },
+  {
+    "path": "internalServerError",
+    "method": "POST",
+    "statusCode": 500,
+    "responseBuilderType": "reflect-request"
   }
 ]

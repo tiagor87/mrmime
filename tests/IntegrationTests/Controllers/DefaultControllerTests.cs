@@ -122,6 +122,20 @@ namespace MrMime.IntegrationTests.Controllers
             response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
 
+        [Theory]
+        [InlineData("ok", HttpStatusCode.OK)]
+        [InlineData("created", HttpStatusCode.Created)]
+        [InlineData("badRequest", HttpStatusCode.BadRequest)]
+        [InlineData("internalServerError", HttpStatusCode.InternalServerError)]
+        public async Task Should_return_chosen_status_code(string url, HttpStatusCode statusCode)
+        {
+            var client = _factory.CreateClient();
+
+            var response = await client.PostAsJsonAsync(url, new { });
+
+            response.StatusCode.Should().Be(statusCode);
+        }
+
         [Fact]
         public async Task Should_copy_response_execute_processors()
         {
