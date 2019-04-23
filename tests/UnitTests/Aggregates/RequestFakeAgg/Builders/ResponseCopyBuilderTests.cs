@@ -54,6 +54,7 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg.Builders
 
             var value = new ResponseCopyBuilder()
                 .FromRequest(request)
+                .WithUrlParams(new Dictionary<string, string>())
                 .WithResponse(responseMock)
                 .Build();
 

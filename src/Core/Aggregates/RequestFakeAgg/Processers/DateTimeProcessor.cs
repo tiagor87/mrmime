@@ -13,7 +13,7 @@ namespace MrMime.Core.Aggregates.RequestFakeAgg.Processers
         }
 
         public void Execute(JObject result, KeyValuePair<string, JToken> property,
-            JObject request = null)
+            JObject request = null, IDictionary<string, string> urlParameters = null)
         {
             result[property.Key] = Regex.Replace(property.Value.ToString(), @"{datetime}",
                 DateTime.UtcNow.ToUniversalTime().ToString("O"),

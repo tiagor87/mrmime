@@ -8,6 +8,6 @@ namespace MrMime.Core.Aggregates.RequestFakeAgg.Processers
         bool ShouldExecute(KeyValuePair<string, JToken> property);
 
         void Execute(JObject result, KeyValuePair<string, JToken> property,
-            JObject request = null);
+            JObject request = null, IDictionary<string, string> urlParameters = null);
     }
 }

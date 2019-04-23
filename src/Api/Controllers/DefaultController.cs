@@ -22,14 +22,15 @@ namespace MrMime.Api.Controllers
         ///     Fakes a get and return Ok (200) with the path
         /// </summary>
         /// <param name="path">Path called</param>
-        /// <returns>Ok with
+        /// <returns>
+        ///     Ok with
         ///     <param name="path"></param>
         /// </returns>
         [HttpGet]
         public IActionResult Get(string path, [FromQuery] IDictionary<string, string> query)
         {
             var fake = _repository.GetRequestFake(path, HttpMethod.Get.Method);
-            return StatusCode(fake.GetResponseStatusCode(), fake.GetResponse(JObject.FromObject(query)));
+            return StatusCode(fake.GetResponseStatusCode(), fake.GetResponse(JObject.FromObject(query), path));
         }
 
         /// <summary>
@@ -37,14 +38,15 @@ namespace MrMime.Api.Controllers
         /// </summary>
         /// <param name="path">Path called</param>
         /// <param name="value">Body content</param>
-        /// <returns>Created with
+        /// <returns>
+        ///     Created with
         ///     <param name="value">body content</param>
         /// </returns>
         [HttpPost]
         public IActionResult Post(string path, [FromBody] JObject value)
         {
             var fake = _repository.GetRequestFake(path, HttpMethod.Post.Method);
-            return StatusCode(fake.GetResponseStatusCode(), fake.GetResponse(value));
+            return StatusCode(fake.GetResponseStatusCode(), fake.GetResponse(value, path));
         }
 
         /// <summary>
@@ -52,14 +54,15 @@ namespace MrMime.Api.Controllers
         /// </summary>
         /// <param name="path">Path called</param>
         /// <param name="value">Body content</param>
-        /// <returns>Ok with
+        /// <returns>
+        ///     Ok with
         ///     <param name="value">body content</param>
         /// </returns>
         [HttpPut]
         public IActionResult Put(string path, [FromBody] JObject value)
         {
             var fake = _repository.GetRequestFake(path, HttpMethod.Put.Method);
-            return StatusCode(fake.GetResponseStatusCode(), fake.GetResponse(value));
+            return StatusCode(fake.GetResponseStatusCode(), fake.GetResponse(value, path));
         }
 
         /// <summary>

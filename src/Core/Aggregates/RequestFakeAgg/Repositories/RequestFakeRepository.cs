@@ -19,7 +19,7 @@ namespace MrMime.Core.Aggregates.RequestFakeAgg.Repositories
             _defaultRequest = new RequestFake
             {
                 Method = "*",
-                Path = "*",
+                Path = ".*",
                 ResponseBuilderType = ResponseBuilderType.RequestReflect
             };
         }

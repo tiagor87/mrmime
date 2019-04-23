@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using MrMime.Core.Aggregates.RequestFakeAgg.Builders;
 using Newtonsoft.Json.Linq;
 
@@ -16,7 +18,17 @@ namespace MrMime.Core.Aggregates.RequestFakeAgg
 
         public int? StatusCode { get; set; }
 
-        public JObject GetResponse(JObject requestValue)
+        public IDictionary<string, string> GetUrlParams(string requestPath)
+        {
+            if (string.IsNullOrWhiteSpace(requestPath)) return new Dictionary<string, string>();
+
+            var regex = new Regex(Path, RegexOptions.IgnoreCase);
+            var groups = regex.Match(requestPath).Groups;
+            return regex.GetGroupNames().Where(name => name != "0")
+                .ToDictionary(groupName => groupName, groupName => groups[groupName].Value);
+        }
+
+        public JObject GetResponse(JObject requestValue, string requestUrl = null)
         {
             var builderTypes = new List<string>
             {
@@ -27,9 +39,15 @@ namespace MrMime.Core.Aggregates.RequestFakeAgg
 
             switch (builderTypes.IndexOf(ResponseBuilderType))
             {
-                case 0: return new ResponseRequestReflectBuilder().FromRequest(requestValue).Build();
-                case 1: return new ResponseRequestMergeBuilder().FromRequest(requestValue).MergeWith(Response).Build();
-                case 2: return new ResponseCopyBuilder().FromRequest(requestValue).WithResponse(Response).Build();
+                case 0:
+                    return new ResponseRequestReflectBuilder().FromRequest(requestValue)
+                        .WithUrlParams(GetUrlParams(requestUrl)).Build();
+                case 1:
+                    return new ResponseRequestMergeBuilder().FromRequest(requestValue).MergeWith(Response)
+                        .WithUrlParams(GetUrlParams(requestUrl)).Build();
+                case 2:
+                    return new ResponseCopyBuilder().FromRequest(requestValue).WithResponse(Response)
+                        .WithUrlParams(GetUrlParams(requestUrl)).Build();
                 default:
                     throw new ArgumentException(
                         $@"Should be ""{Builders.ResponseBuilderType.RequestReflect}"" or ""{Builders.ResponseBuilderType.RequestMerge}"".",

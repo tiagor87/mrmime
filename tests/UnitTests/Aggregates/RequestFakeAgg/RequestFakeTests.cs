@@ -12,29 +12,26 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg
 {
     public class RequestFakeTests
     {
-        [Fact]
-        public void Should_get_response_when_has_null_value()
+        [Theory]
+        [InlineData("api/customers/(?<customerId>[\\w_]+)", "api/customers/cus_123456", "customerId", "cus_123456")]
+        [InlineData("api/customers/(?<customerId>[\\w_]+)/transactions/(?<transactionId>[\\w_]+)",
+            "api/customers/cus_123456/transactions/tran_123456", "transactionId", "tran_123456")]
+        public void Should_get_url_parameters(string path, string requestPath, string parameter, string parameterValue)
         {
-            var requestJson = @"{
-                ""name"": ""Tiago Resende"",
-                ""age"": 31,
-                ""null_value"": null
-            }";
-
-            var requestBody = JsonConvert.DeserializeObject<JObject>(requestJson);
             var request = new RequestFake
             {
-                Path = "users",
-                Method = HttpMethod.Post.Method,
-                Response = null,
-                ResponseBuilderType = ResponseBuilderType.RequestReflect
+                Path = path,
+                Method = "GET",
+                ResponseBuilderType = ResponseBuilderType.ResponseCopy
             };
 
-            request.Invoking(x => x.GetResponse(requestBody))
+            request.GetUrlParams(requestPath)
                 .Should()
-                .NotThrow();
+                .ContainKey(parameter)
+                .And
+                .ContainValue(parameterValue);
         }
-        
+
         [Fact]
         public void Should_get_response_when_has_array_value()
         {
@@ -58,6 +55,29 @@ namespace MrMime.UnitTests.Aggregates.RequestFakeAgg
             var result = request.GetResponse(requestBody);
             result["contacts"].Should().HaveCount(1);
             result["contacts"].ToList().First()["contact"].Value<string>().Should().Be("contact 1");
+        }
+
+        [Fact]
+        public void Should_get_response_when_has_null_value()
+        {
+            var requestJson = @"{
+                ""name"": ""Tiago Resende"",
+                ""age"": 31,
+                ""null_value"": null
+            }";
+
+            var requestBody = JsonConvert.DeserializeObject<JObject>(requestJson);
+            var request = new RequestFake
+            {
+                Path = "users",
+                Method = HttpMethod.Post.Method,
+                Response = null,
+                ResponseBuilderType = ResponseBuilderType.RequestReflect
+            };
+
+            request.Invoking(x => x.GetResponse(requestBody))
+                .Should()
+                .NotThrow();
         }
 
         [Fact]

@@ -40,7 +40,7 @@
     }
   },
   {
-    "path": "Sale/Query/TransactionReference=tran_\\w+",
+    "path": "Sale/Query/TransactionReference=(?<transactionReference>tran_\\w+)",
     "method": "GET",
     "responseBuilderType": "merge-request",
     "response": {
