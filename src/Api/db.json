@@ -1,5 +1,13 @@
 [
   {
+    "path": "files",
+    "method": "POST",
+    "responseBuilderType": "stream",
+    "response": {
+      "path": "appsettings.Development.json"
+    }
+  },
+  {
     "path": "customers",
     "method": "POST",
     "responseBuilderType": "merge-request",

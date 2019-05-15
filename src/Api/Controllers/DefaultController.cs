@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Mime;
 using Microsoft.AspNetCore.Mvc;
 using MrMime.Core.Aggregates.RequestFakeAgg.Repositories;
 using Newtonsoft.Json.Linq;
@@ -22,6 +23,7 @@ namespace MrMime.Api.Controllers
         ///     Fakes a get and return Ok (200) with the path
         /// </summary>
         /// <param name="path">Path called</param>
+        /// <param name="query">Query parameters</param>
         /// <returns>
         ///     Ok with
         ///     <param name="path"></param>
@@ -30,6 +32,8 @@ namespace MrMime.Api.Controllers
         public IActionResult Get(string path, [FromQuery] IDictionary<string, string> query)
         {
             var fake = _repository.GetRequestFake(path, HttpMethod.Get.Method);
+            if (fake.IsStreamResponse)
+                return File(fake.GetStreamResponse(), MediaTypeNames.Application.Octet);
             return StatusCode(fake.GetResponseStatusCode(), fake.GetResponse(JObject.FromObject(query), path));
         }
 
@@ -46,6 +50,8 @@ namespace MrMime.Api.Controllers
         public IActionResult Post(string path, [FromBody] JObject value)
         {
             var fake = _repository.GetRequestFake(path, HttpMethod.Post.Method);
+            if (fake.IsStreamResponse)
+                return File(fake.GetStreamResponse(), MediaTypeNames.Application.Octet);
             return StatusCode(fake.GetResponseStatusCode(), fake.GetResponse(value, path));
         }
 

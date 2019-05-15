@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
@@ -15,8 +16,8 @@ namespace MrMime.Core.Aggregates.RequestFakeAgg
         public string Method { get; set; }
         public string ResponseBuilderType { get; set; }
         public JObject Response { get; set; }
-
         public int? StatusCode { get; set; }
+        public bool IsStreamResponse => ResponseBuilderType == Builders.ResponseBuilderType.Stream;
 
         public IDictionary<string, string> GetUrlParams(string requestPath)
         {
@@ -28,13 +29,21 @@ namespace MrMime.Core.Aggregates.RequestFakeAgg
                 .ToDictionary(groupName => groupName, groupName => groups[groupName].Value);
         }
 
+        public Stream GetStreamResponse()
+        {
+            if (!IsStreamResponse) throw new NotSupportedException("Method is allowed just for stream responses.");
+
+            return File.OpenRead(Response["path"].Value<string>());
+        }
+
         public JObject GetResponse(JObject requestValue, string requestUrl = null)
         {
             var builderTypes = new List<string>
             {
                 Builders.ResponseBuilderType.RequestReflect,
                 Builders.ResponseBuilderType.RequestMerge,
-                Builders.ResponseBuilderType.ResponseCopy
+                Builders.ResponseBuilderType.ResponseCopy,
+                Builders.ResponseBuilderType.Stream
             };
 
             switch (builderTypes.IndexOf(ResponseBuilderType))
@@ -48,6 +57,8 @@ namespace MrMime.Core.Aggregates.RequestFakeAgg
                 case 2:
                     return new ResponseCopyBuilder().FromRequest(requestValue).WithResponse(Response)
                         .WithUrlParams(GetUrlParams(requestUrl)).Build();
+                case 3:
+
                 default:
                     throw new ArgumentException(
                         $@"Should be ""{Builders.ResponseBuilderType.RequestReflect}"" or ""{Builders.ResponseBuilderType.RequestMerge}"".",
